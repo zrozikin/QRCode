@@ -217,7 +217,7 @@ Project ini dilisensikan di bawah MIT License - lihat file [LICENSE](LICENSE) un
 
 ## 👤 Author
 
-Dibuat dengan ❤️ oleh [Your Name]
+Dibuat dengan ❤️ oleh Zain
 
 ## 🙏 Acknowledgments
 
@@ -230,7 +230,7 @@ Dibuat dengan ❤️ oleh [Your Name]
 
 Jika ada pertanyaan atau issue, silakan:
 - Buat GitHub Issue
-- Email: your.email@example.com
+- Email: zrozikin11@gmail.com
 - Discord: [Link to Discord]
 
 ---
