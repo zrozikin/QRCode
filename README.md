@@ -68,7 +68,7 @@ git push origin main
 - Source: Branch `main`, folder `/ (root)`
 - Save
 
-3. Website akan live di: `https://username.github.io/qrcode-generator`
+3. Website akan live di: `https://zrozikin.github.io/QRCode/`
 
 ### Option 2: Vercel (RECOMMENDED - TERCEPAT)
 
@@ -226,7 +226,7 @@ Project ini dilisensikan di bawah MIT License - lihat file [LICENSE](LICENSE) un
 
 ## 👤 Author
 
-Dibuat dengan ❤️ oleh [Your Name]
+Dikembangkan oleh ZR48
 
 ## 🙏 Acknowledgments
 
