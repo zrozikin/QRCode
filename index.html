@@ -436,8 +436,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔷 QR Code Generator ZR48</h1>
-            <p>Buat QR Code yang cantik dan dapat dikustomisasi dengan mudah dan Gratis</p>
+            <h1>🔷 QR Code Generator</h1>
+            <p>Buat QR Code yang cantik dan dapat dikustomisasi dengan mudah</p>
         </div>
 
         <div class="content">
@@ -565,8 +565,11 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    logoImage = new Image();
-                    logoImage.onload = function() {
+                    const tempImg = new Image();
+                    tempImg.onload = function() {
+                        // Simpan sebagai image object
+                        logoImage = tempImg;
+                        
                         // Tampilkan preview
                         logoPreview.innerHTML = `
                             <div style="text-align: center;">
@@ -575,11 +578,11 @@
                                 <button type="button" class="logo-clear-btn" onclick="clearLogo()">Clear Logo</button>
                             </div>
                         `;
-                        logoImage.src = event.target.result;
-                        generateQRCode();
                         showToast('Logo berhasil ditambahkan!', 'success');
+                        // Generate setelah logo fully loaded
+                        generateQRCode();
                     };
-                    logoImage.src = event.target.result;
+                    tempImg.src = event.target.result;
                 };
                 reader.readAsDataURL(file);
             }
@@ -643,7 +646,13 @@
             previewBox.innerHTML = '';
 
             try {
-                currentQRCode = new QRCode(previewBox, {
+                // Temporary container untuk QR code
+                const tempContainer = document.createElement('div');
+                document.body.appendChild(tempContainer);
+                tempContainer.style.display = 'none';
+
+                // Create QR code di temporary container
+                const qrCode = new QRCode(tempContainer, {
                     text: text,
                     width: size,
                     height: size,
@@ -652,23 +661,38 @@
                     correctLevel: QRCode.CorrectLevel.H
                 });
 
-                // Tunggu sebentar untuk QR code selesai di-render
+                // Tunggu QR code selesai render
                 setTimeout(() => {
-                    const qrImage = previewBox.querySelector('img') || previewBox.querySelector('canvas');
-                    if (qrImage && logoImage) {
-                        // Add logo to QR code
-                        addLogoToQRCode(qrImage);
-                    } else if (qrImage) {
-                        // Styling QR Code tanpa logo
-                        qrImage.id = 'qrCode';
-                        qrImage.style.maxWidth = '100%';
-                        qrImage.style.maxHeight = '100%';
-                        qrImage.style.borderRadius = '10px';
-                        previewBox.classList.add('has-qr');
-                        actionButtons.style.display = 'grid';
-                        showToast('QR Code berhasil dibuat!', 'success');
+                    const qrImage = tempContainer.querySelector('canvas') || tempContainer.querySelector('img');
+                    
+                    if (qrImage) {
+                        if (logoImage) {
+                            // Add logo to QR code
+                            addLogoToQRCode(qrImage);
+                        } else {
+                            // Display QR code tanpa logo
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            canvas.width = size;
+                            canvas.height = size;
+                            
+                            ctx.drawImage(qrImage, 0, 0);
+                            
+                            previewBox.innerHTML = '';
+                            canvas.id = 'qrCode';
+                            canvas.style.maxWidth = '100%';
+                            canvas.style.maxHeight = '100%';
+                            canvas.style.borderRadius = '10px';
+                            previewBox.appendChild(canvas);
+                            previewBox.classList.add('has-qr');
+                            actionButtons.style.display = 'grid';
+                            showToast('QR Code berhasil dibuat!', 'success');
+                        }
                     }
-                }, 500);
+                    
+                    // Clean up
+                    document.body.removeChild(tempContainer);
+                }, 200);
             } catch (error) {
                 previewBox.innerHTML = `
                     <div class="placeholder">
@@ -682,44 +706,64 @@
 
         // Function to add logo to QR code
         function addLogoToQRCode(qrImage) {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const size = parseInt(sizeSlider.value);
-            
-            canvas.width = size;
-            canvas.height = size;
-
-            // Draw QR code
-            if (qrImage.tagName === 'CANVAS') {
-                ctx.drawImage(qrImage, 0, 0);
-            } else {
-                ctx.drawImage(qrImage, 0, 0);
+            // Ensure logo image is fully loaded
+            if (!logoImage || !logoImage.complete) {
+                showToast('Logo masih loading, coba lagi...', 'error');
+                return;
             }
 
-            // Calculate logo size (20% of QR code)
-            const logoSize = size * 0.25;
-            const logoX = (size - logoSize) / 2;
-            const logoY = (size - logoSize) / 2;
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const size = parseInt(sizeSlider.value);
+                
+                canvas.width = size;
+                canvas.height = size;
 
-            // Draw white background for logo
-            ctx.fillStyle = 'white';
-            ctx.beginPath();
-            ctx.arc(size / 2, size / 2, logoSize / 2 + 5, 0, 2 * Math.PI);
-            ctx.fill();
+                // Set canvas background color sesuai bgColor
+                ctx.fillStyle = bgColor.value;
+                ctx.fillRect(0, 0, size, size);
 
-            // Draw logo
-            ctx.drawImage(logoImage, logoX, logoY, logoSize, logoSize);
+                // Draw QR code
+                if (qrImage && qrImage.tagName === 'CANVAS') {
+                    ctx.drawImage(qrImage, 0, 0, size, size);
+                } else if (qrImage) {
+                    ctx.drawImage(qrImage, 0, 0, size, size);
+                }
 
-            // Replace preview with new canvas
-            previewBox.innerHTML = '';
-            canvas.id = 'qrCode';
-            canvas.style.maxWidth = '100%';
-            canvas.style.maxHeight = '100%';
-            canvas.style.borderRadius = '10px';
-            previewBox.appendChild(canvas);
-            previewBox.classList.add('has-qr');
-            actionButtons.style.display = 'grid';
-            showToast('QR Code dengan logo berhasil dibuat!', 'success');
+                // Calculate logo size (25% of QR code)
+                const logoSize = size * 0.25;
+                const logoX = (size - logoSize) / 2;
+                const logoY = (size - logoSize) / 2;
+                const circlePadding = 8;
+
+                // Draw white circular background for logo
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(size / 2, size / 2, logoSize / 2 + circlePadding, 0, 2 * Math.PI);
+                ctx.fill();
+
+                // Draw logo image
+                if (logoImage) {
+                    ctx.drawImage(logoImage, logoX, logoY, logoSize, logoSize);
+                }
+
+                // Clear preview and add new canvas
+                previewBox.innerHTML = '';
+                canvas.id = 'qrCode';
+                canvas.style.maxWidth = '100%';
+                canvas.style.maxHeight = '100%';
+                canvas.style.borderRadius = '10px';
+                canvas.style.display = 'block';
+                previewBox.appendChild(canvas);
+                
+                previewBox.classList.add('has-qr');
+                actionButtons.style.display = 'grid';
+                showToast('✓ QR Code dengan logo berhasil dibuat!', 'success');
+            } catch (error) {
+                console.error('Error adding logo:', error);
+                showToast('Error: ' + error.message, 'error');
+            }
         }
 
         // Download QR Code
@@ -803,11 +847,14 @@
             bgColorValue.textContent = '#FFFFFF';
             fgColor.value = '#000000';
             fgColorValue.textContent = '#000000';
+            
+            // Clear logo
             logoImage = null;
             logoUpload.value = '';
             logoPreview.innerHTML = '';
+            
             generateQRCode();
-            showToast('Pengaturan direset ke default', 'success');
+            showToast('✓ Pengaturan direset ke default', 'success');
         });
 
         // Toast notification
