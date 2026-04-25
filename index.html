@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator - Simple & Powerful</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0F9B8C 0%, #26D0CE 50%, #F0FFFD 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .control-section h2 {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #0F9B8C;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="number"]:focus {
+            outline: none;
+            border-color: #0F9B8C;
+            box-shadow: 0 0 0 3px rgba(15, 155, 140, 0.1);
+        }
+
+        .color-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .color-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .form-group input[type="color"] {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .form-group input[type="color"]:hover {
+            transform: scale(1.05);
+        }
+
+        .color-value {
+            color: #666;
+            font-size: 0.9em;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            flex: 1;
+        }
+
+        .slider-group {
+            margin-bottom: 25px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .slider-header label {
+            color: #333;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .size-value {
+            background: #0F9B8C;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: linear-gradient(to right, #0F9B8C, #26D0CE);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            border: 3px solid #0F9B8C;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            border: 3px solid #0F9B8C;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, #0F9B8C 0%, #26D0CE 100%);
+            color: white;
+            grid-column: span 2;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(15, 155, 140, 0.3);
+        }
+
+        .btn-generate:active {
+            transform: translateY(0);
+        }
+
+        .btn-reset {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .btn-reset:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-download,
+        .btn-copy {
+            background: #f0f0f0;
+            color: #333;
+            padding: 10px 15px;
+            font-size: 0.95em;
+        }
+
+        .btn-download:hover,
+        .btn-copy:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-download.success,
+        .btn-copy.success {
+            background: #4caf50;
+            color: white;
+        }
+
+        .preview-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .preview-box {
+            width: 100%;
+            aspect-ratio: 1;
+            background: #f9f9f9;
+            border: 2px dashed #e0e0e0;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            min-height: 350px;
+            transition: all 0.3s;
+        }
+
+        .preview-box.has-qr {
+            border-color: #0F9B8C;
+            background: white;
+        }
+
+        #qrCode {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 10px;
+        }
+
+        .placeholder {
+            text-align: center;
+            color: #999;
+        }
+
+        .placeholder svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+
+        .placeholder p {
+            font-size: 1.1em;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .action-buttons button {
+            padding: 12px 20px;
+            font-size: 0.95em;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-buttons button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .action-buttons .btn-download {
+            background: #2196F3;
+            color: white;
+        }
+
+        .action-buttons .btn-download:hover:not(:disabled) {
+            background: #1976D2;
+        }
+
+        .action-buttons .btn-copy {
+            background: #FF9800;
+            color: white;
+        }
+
+        .action-buttons .btn-copy:hover:not(:disabled) {
+            background: #F57C00;
+        }
+
+        .action-buttons .btn-copy.success {
+            background: #4caf50;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-generate {
+                grid-column: span 1;
+            }
+
+            .color-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.error {
+            background: #f44336;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .toast.hide {
+            animation: slideOut 0.3s ease;
+        }
+
+        /* Logo Preview Styling */
+        #logoPreview img {
+            max-width: 80px;
+            max-height: 80px;
+            border-radius: 8px;
+            border: 2px solid #0F9B8C;
+            padding: 5px;
+            background: #f0fffd;
+        }
+
+        .logo-clear-btn {
+            background: #ff6b6b;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin-top: 8px;
+            transition: all 0.3s;
+        }
+
+        .logo-clear-btn:hover {
+            background: #ff5252;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔷 QR Code Generator</h1>
+            <p>Buat QR Code yang cantik dan dapat dikustomisasi dengan mudah</p>
+        </div>
+
+        <div class="content">
+            <!-- Control Section -->
+            <div class="control-section">
+                <h2>⚙️ Pengaturan</h2>
+
+                <div class="form-group">
+                    <label for="inputText">Teks atau URL</label>
+                    <input 
+                        type="text" 
+                        id="inputText" 
+                        placeholder="Masukkan teks atau URL..."
+                        value="https://example.com"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="logoUpload">📸 Logo Custom (Opsional)</label>
+                    <input 
+                        type="file" 
+                        id="logoUpload" 
+                        accept="image/*"
+                        style="padding: 8px; cursor: pointer; border: 2px dashed #e0e0e0; border-radius: 8px; width: 100%;"
+                    >
+                    <small style="color: #999; display: block; margin-top: 5px;">
+                        Upload gambar untuk ditambahkan di tengah QR Code (jpg, png, gif)
+                    </small>
+                    <div id="logoPreview" style="margin-top: 10px;">
+                        <!-- Logo preview akan tampil di sini -->
+                    </div>
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <label>Ukuran</label>
+                        <span class="size-value"><span id="sizeValue">300</span>px</span>
+                    </div>
+                    <input 
+                        type="range" 
+                        id="sizeSlider" 
+                        min="200" 
+                        max="600" 
+                        step="50" 
+                        value="300"
+                    >
+                </div>
+
+                <div class="color-group">
+                    <div>
+                        <label>Warna Latar</label>
+                        <div class="color-input-wrapper">
+                            <input type="color" id="bgColor" value="#ffffff">
+                            <span class="color-value" id="bgColorValue">#FFFFFF</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Warna Pola</label>
+                        <div class="color-input-wrapper">
+                            <input type="color" id="fgColor" value="#000000">
+                            <span class="color-value" id="fgColorValue">#000000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-generate" id="generateBtn">Generate QR Code</button>
+                    <button class="btn-reset" id="resetBtn">Reset</button>
+                </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="preview-section">
+                <h2 style="text-align: center; margin-bottom: 20px; color: #333;">👀 Pratinjau</h2>
+                
+                <div class="preview-box" id="previewBox">
+                    <div class="placeholder">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                        <p>QR Code akan tampil di sini</p>
+                    </div>
+                </div>
+
+                <div class="action-buttons" id="actionButtons" style="display: none;">
+                    <button class="btn-download" id="downloadBtn">
+                        📥 Download
+                    </button>
+                    <button class="btn-copy" id="copyBtn">
+                        📋 Copy
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script>
+        // Elemen DOM
+        const inputText = document.getElementById('inputText');
+        const sizeSlider = document.getElementById('sizeSlider');
+        const sizeValue = document.getElementById('sizeValue');
+        const bgColor = document.getElementById('bgColor');
+        const bgColorValue = document.getElementById('bgColorValue');
+        const fgColor = document.getElementById('fgColor');
+        const fgColorValue = document.getElementById('fgColorValue');
+        const generateBtn = document.getElementById('generateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const previewBox = document.getElementById('previewBox');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const actionButtons = document.getElementById('actionButtons');
+
+        let currentQRCode = null;
+        let logoImage = null;
+
+        // Logo upload handler
+        const logoUpload = document.getElementById('logoUpload');
+        const logoPreview = document.getElementById('logoPreview');
+
+        logoUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    logoImage = new Image();
+                    logoImage.onload = function() {
+                        // Tampilkan preview
+                        logoPreview.innerHTML = `
+                            <div style="text-align: center;">
+                                <img src="${event.target.result}" style="max-width: 80px; max-height: 80px; border-radius: 8px; border: 2px solid #0F9B8C; padding: 5px; background: #f0fffd;">
+                                <br>
+                                <button type="button" class="logo-clear-btn" onclick="clearLogo()">Clear Logo</button>
+                            </div>
+                        `;
+                        logoImage.src = event.target.result;
+                        generateQRCode();
+                        showToast('Logo berhasil ditambahkan!', 'success');
+                    };
+                    logoImage.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Function to clear logo
+        function clearLogo() {
+            logoImage = null;
+            logoUpload.value = '';
+            logoPreview.innerHTML = '';
+            generateQRCode();
+            showToast('Logo dihapus', 'success');
+        }
+
+        // Update warna background display
+        bgColor.addEventListener('change', function() {
+            bgColorValue.textContent = this.value.toUpperCase();
+            generateQRCode();
+        });
+
+        // Update warna foreground display
+        fgColor.addEventListener('change', function() {
+            fgColorValue.textContent = this.value.toUpperCase();
+            generateQRCode();
+        });
+
+        // Update ukuran display
+        sizeSlider.addEventListener('input', function() {
+            sizeValue.textContent = this.value;
+            generateQRCode();
+        });
+
+        // Auto-generate saat input berubah
+        inputText.addEventListener('input', function() {
+            generateQRCode();
+        });
+
+        // Generate QR Code
+        function generateQRCode() {
+            const text = inputText.value.trim();
+            
+            if (!text) {
+                previewBox.innerHTML = `
+                    <div class="placeholder">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                        <p>Masukkan teks atau URL untuk generate QR Code</p>
+                    </div>
+                `;
+                actionButtons.style.display = 'none';
+                previewBox.classList.remove('has-qr');
+                return;
+            }
+
+            const size = parseInt(sizeSlider.value);
+            const bg = bgColor.value;
+            const fg = fgColor.value;
+
+            // Hapus QR Code lama
+            previewBox.innerHTML = '';
+
+            try {
+                currentQRCode = new QRCode(previewBox, {
+                    text: text,
+                    width: size,
+                    height: size,
+                    colorDark: fg,
+                    colorLight: bg,
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+
+                // Tunggu sebentar untuk QR code selesai di-render
+                setTimeout(() => {
+                    const qrImage = previewBox.querySelector('img') || previewBox.querySelector('canvas');
+                    if (qrImage && logoImage) {
+                        // Add logo to QR code
+                        addLogoToQRCode(qrImage);
+                    } else if (qrImage) {
+                        // Styling QR Code tanpa logo
+                        qrImage.id = 'qrCode';
+                        qrImage.style.maxWidth = '100%';
+                        qrImage.style.maxHeight = '100%';
+                        qrImage.style.borderRadius = '10px';
+                        previewBox.classList.add('has-qr');
+                        actionButtons.style.display = 'grid';
+                        showToast('QR Code berhasil dibuat!', 'success');
+                    }
+                }, 500);
+            } catch (error) {
+                previewBox.innerHTML = `
+                    <div class="placeholder">
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+                actionButtons.style.display = 'none';
+                showToast('Error: Gagal membuat QR Code', 'error');
+            }
+        }
+
+        // Function to add logo to QR code
+        function addLogoToQRCode(qrImage) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const size = parseInt(sizeSlider.value);
+            
+            canvas.width = size;
+            canvas.height = size;
+
+            // Draw QR code
+            if (qrImage.tagName === 'CANVAS') {
+                ctx.drawImage(qrImage, 0, 0);
+            } else {
+                ctx.drawImage(qrImage, 0, 0);
+            }
+
+            // Calculate logo size (20% of QR code)
+            const logoSize = size * 0.25;
+            const logoX = (size - logoSize) / 2;
+            const logoY = (size - logoSize) / 2;
+
+            // Draw white background for logo
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(size / 2, size / 2, logoSize / 2 + 5, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Draw logo
+            ctx.drawImage(logoImage, logoX, logoY, logoSize, logoSize);
+
+            // Replace preview with new canvas
+            previewBox.innerHTML = '';
+            canvas.id = 'qrCode';
+            canvas.style.maxWidth = '100%';
+            canvas.style.maxHeight = '100%';
+            canvas.style.borderRadius = '10px';
+            previewBox.appendChild(canvas);
+            previewBox.classList.add('has-qr');
+            actionButtons.style.display = 'grid';
+            showToast('QR Code dengan logo berhasil dibuat!', 'success');
+        }
+
+        // Download QR Code
+        downloadBtn.addEventListener('click', function() {
+            const qrImage = previewBox.querySelector('img') || previewBox.querySelector('canvas');
+            
+            if (!qrImage) {
+                showToast('QR Code belum dibuat', 'error');
+                return;
+            }
+
+            try {
+                const link = document.createElement('a');
+                
+                // Jika canvas
+                if (qrImage.tagName === 'CANVAS') {
+                    link.href = qrImage.toDataURL('image/png');
+                } else {
+                    // Jika image
+                    link.href = qrImage.src;
+                }
+                
+                link.download = `qrcode-${Date.now()}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showToast('QR Code berhasil didownload!', 'success');
+            } catch (error) {
+                showToast('Error: Gagal download QR Code', 'error');
+            }
+        });
+
+        // Copy to Clipboard
+        copyBtn.addEventListener('click', function() {
+            const qrImage = previewBox.querySelector('img') || previewBox.querySelector('canvas');
+            
+            if (!qrImage) {
+                showToast('QR Code belum dibuat', 'error');
+                return;
+            }
+
+            try {
+                if (qrImage.tagName === 'CANVAS') {
+                    qrImage.toBlob(function(blob) {
+                        navigator.clipboard.write([
+                            new ClipboardItem({ 'image/png': blob })
+                        ]).then(() => {
+                            showToast('QR Code berhasil disalin!', 'success');
+                            copyBtn.classList.add('success');
+                            setTimeout(() => copyBtn.classList.remove('success'), 2000);
+                        });
+                    });
+                } else {
+                    fetch(qrImage.src)
+                        .then(res => res.blob())
+                        .then(blob => {
+                            navigator.clipboard.write([
+                                new ClipboardItem({ 'image/png': blob })
+                            ]).then(() => {
+                                showToast('QR Code berhasil disalin!', 'success');
+                                copyBtn.classList.add('success');
+                                setTimeout(() => copyBtn.classList.remove('success'), 2000);
+                            });
+                        });
+                }
+            } catch (error) {
+                showToast('Error: Gagal copy QR Code', 'error');
+            }
+        });
+
+        // Generate button click
+        generateBtn.addEventListener('click', generateQRCode);
+
+        // Reset settings
+        resetBtn.addEventListener('click', function() {
+            inputText.value = 'https://example.com';
+            sizeSlider.value = '300';
+            sizeValue.textContent = '300';
+            bgColor.value = '#ffffff';
+            bgColorValue.textContent = '#FFFFFF';
+            fgColor.value = '#000000';
+            fgColorValue.textContent = '#000000';
+            logoImage = null;
+            logoUpload.value = '';
+            logoPreview.innerHTML = '';
+            generateQRCode();
+            showToast('Pengaturan direset ke default', 'success');
+        });
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Generate QR Code saat pertama kali load
+        generateQRCode();
+    </script>
+</body>
+</html>
