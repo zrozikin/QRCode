@@ -2,7 +2,7 @@
 
 Semua perubahan penting pada project ini akan didokumentasikan di file ini.
 
-## [2.0.0] - 2024 (Update Terbaru)
+## [2.0.0] - 2026 (Update Terbaru)
 
 ### ✨ Features Baru
 - **Logo Custom di QR Code** 🆕
